@@ -1,0 +1,10 @@
+c:\users\админ\documents\visual studio 2015\Projects\ArduinoMeteo\ArduinoMeteo\bin\Debug\ArduinoMeteo.exe.config
+c:\users\админ\documents\visual studio 2015\Projects\ArduinoMeteo\ArduinoMeteo\bin\Debug\ArduinoMeteo.exe
+c:\users\админ\documents\visual studio 2015\Projects\ArduinoMeteo\ArduinoMeteo\bin\Debug\ArduinoMeteo.pdb
+c:\users\админ\documents\visual studio 2015\Projects\ArduinoMeteo\ArduinoMeteo\obj\Debug\ArduinoMeteo.csprojResolveAssemblyReference.cache
+c:\users\админ\documents\visual studio 2015\Projects\ArduinoMeteo\ArduinoMeteo\obj\Debug\ArduinoMeteo.Form1.resources
+c:\users\админ\documents\visual studio 2015\Projects\ArduinoMeteo\ArduinoMeteo\obj\Debug\ArduinoMeteo.Properties.Resources.resources
+c:\users\админ\documents\visual studio 2015\Projects\ArduinoMeteo\ArduinoMeteo\obj\Debug\ArduinoMeteo.csproj.GenerateResource.Cache
+c:\users\админ\documents\visual studio 2015\Projects\ArduinoMeteo\ArduinoMeteo\obj\Debug\ArduinoMeteo.exe
+c:\users\админ\documents\visual studio 2015\Projects\ArduinoMeteo\ArduinoMeteo\obj\Debug\ArduinoMeteo.pdb
+c:\users\админ\documents\visual studio 2015\Projects\ArduinoMeteo\ArduinoMeteo\obj\Debug\ArduinoMeteo.SettingForm.resources
