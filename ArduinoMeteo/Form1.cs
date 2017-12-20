@@ -10,6 +10,7 @@ using System.Windows.Forms;
 
 using System.IO.Ports;
 using System.IO;
+using System.Windows.Forms.DataVisualization.Charting;
 
 
 namespace ArduinoMeteo
@@ -23,6 +24,9 @@ namespace ArduinoMeteo
         private bool fPing = true;
         int s = 0;
         //********************************
+        private bool fChart = false;
+
+
 
         public Form1()
         {
@@ -33,9 +37,11 @@ namespace ArduinoMeteo
             initSerialPort();           //функция инициализации порта
             timer1.Start();             //старт таймера для пинга
 
-            
-            
-            
+
+            startCharts(chartCurrTemp, Color.Red);
+            startCharts(chartCurrPressure, Color.Blue);
+            //startChart();
+
         }
 
         private void initSerialPort ()
@@ -116,12 +122,21 @@ namespace ArduinoMeteo
 
 
         //Запись в файл
-        private delegate void LineReceivedEvent(string pressure);   //Запись влажности
+        int countPressure = 0;
+        private delegate void LineReceivedEvent(string pressure);   //Запись давления
         private void LineReceived(string pressure)
         {
             textBox1.Text = pressure;                       //отображение значения
-            string path = "Лог атмосферного давления.txt";   //Наименование файла с логами
+            string path = settings.dbPressure();            //Наименование файла с логами
             string date = DateTime.Now.ToString();          //получаем текущую дату
+
+
+            //chartCurrPressure.ChartAreas[0].AxisX.ScaleView.Zoom(0, countTemp);
+            chartCurrPressure.Series[0].Points.AddXY(date, pressure);
+            scaleChart(chartCurrPressure);
+            //chart1.Series[0].Points.RemoveAt(0);
+            countPressure++;
+
             using (StreamWriter sw = File.AppendText(path)) //директива для записи в файл
             {
                 sw.WriteLine(pressure);     //запись давления
@@ -129,12 +144,22 @@ namespace ArduinoMeteo
             }
         }
 
+
+        int countTemp = 0;
         private delegate void LineReceivedEvent1(string temp);  //Температура. Аналогично давлению
         private void LineReceived1(string temp)
         {
             textBox2.Text = temp;
             string path = "Лог температуры.txt";            //наименование файла с логами
             string date = DateTime.Now.ToString();
+
+
+            //chartCurrTemp.ChartAreas[0].AxisX.ScaleView.Zoom(0, countTemp);
+            chartCurrTemp.Series[0].Points.AddXY(date, temp);
+            scaleChart(chartCurrTemp);
+            //chart1.Series[0].Points.RemoveAt(0);
+            countTemp++;
+
             using (StreamWriter sw = File.AppendText(path))
             {
                 sw.WriteLine(temp);
@@ -177,6 +202,70 @@ namespace ArduinoMeteo
             }
         }
 
+        private delegate void chartRefresh();
+
+        
+
+        private void startChart ()  //графики на второй вкладке
+        {
+            
+            //chart1.ChartAreas[0].AxisX.ScaleView.Zoom(0, 200);
+            chart1.ChartAreas[0].CursorX.IsUserEnabled = true;
+            chart1.ChartAreas[0].CursorX.IsUserSelectionEnabled = true;
+            chart1.ChartAreas[0].AxisX.ScaleView.Zoomable = true;
+            chart1.ChartAreas[0].AxisX.ScrollBar.IsPositionedInside = true;
+            chart1.ChartAreas[0].AxisY.Interval = 1;
+
+            StreamReader streamReader = new StreamReader(settings.dbTemp());
+            //chart1.Series[0].Points.Clear();
+
+            while (!streamReader.EndOfStream)
+            {
+                string Y = streamReader.ReadLine();
+                string X = streamReader.ReadLine();
+
+                chart1.Series[0].Color = Color.Red;
+                chart1.Series[0].BorderWidth = 1;
+                chart1.Series[0].Points.AddXY(X, Y);
+            }
+            streamReader.Close();
+
+
+
+
+            //chart3.ChartAreas[0].AxisX.ScaleView.Zoom(0, 200);
+            chart3.ChartAreas[0].CursorX.IsUserEnabled = true;
+            chart3.ChartAreas[0].CursorX.IsUserSelectionEnabled = true;
+            chart3.ChartAreas[0].AxisX.ScaleView.Zoomable = true;
+            chart3.ChartAreas[0].AxisX.ScrollBar.IsPositionedInside = true;
+            //chart3.ChartAreas[0].AxisY.Interval = 0.5;
+
+            streamReader = new StreamReader(settings.dbPressure());
+            //chart3.Series[0].Points.Clear();
+
+            while (!streamReader.EndOfStream)
+            {
+                string Y = streamReader.ReadLine();
+                string X = streamReader.ReadLine();
+
+                chart3.Series[0].Color = Color.Blue;
+                chart3.Series[0].BorderWidth = 1;
+                chart3.Series[0].Points.AddXY(X, Y);
+            }
+            streamReader.Close();
+
+            //var points = chart1.Series[0].Points;
+            //chart1.ChartAreas[0].AxisY.Minimum = Math.Floor(points.Min(x => x.YValues[0]));      //минимальное значение Y. Округление в меньшую сторону
+            //chart1.ChartAreas[0].AxisY.Maximum = Math.Ceiling(points.Max(x => x.YValues[0]));    //макимальное значение Y. Округление в большую сторону
+            //chart1.ChartAreas[0].AxisX.ScaleView.Zoom(0, points.Count());
+
+            //chart1.chang
+            scaleChart(chart1);
+            scaleChart(chart3);
+            fChart = true;
+
+        }
+
         //************************ПИНГ - ТАЙМЕР
         private void timer1_Tick(object sender, EventArgs e)    //функция таймера
         {
@@ -192,6 +281,16 @@ namespace ArduinoMeteo
                 label3.ForeColor = Color.Black;
                 label3.BackColor = Color.Black;
             }
+
+            if (chart1.Visible)
+                button3.Text = "Отображается";
+
+            //if (fChart)
+            //{
+            //    scaleChart(chart1);
+            //    scaleChart(chart3);
+            //    fChart = false;
+            //}
 
         }
 
@@ -212,10 +311,59 @@ namespace ArduinoMeteo
                 //c.Wait();
                 //if (c.Result)
 
-                    System.Threading.Thread.Sleep(1650);        // упрощённая задержка по сравнению с верхними строками
+                System.Threading.Thread.Sleep(1650);        // упрощённая задержка по сравнению с верхними строками
                 serialPort1.Write(settings.getTimeUpdate());    //сама передач в порт
             }
 
         }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            startChart();
+        }
+
+        private void button3_Click(object sender, EventArgs e)  ///тестовая кнопка
+        {
+            //scaleChart(chart1); 
+            //scaleChart(chart3);
+
+            //chartRefresh cartRefresh = new chartRefresh(startChart);
+            //cartRefresh();
+            //chart1.BeginInvoke(new chartRefresh(startChart));
+            chart1.Invoke(new Action(() => { startChart(); }));
+        }
+
+        //Таймер 2
+        private void timer2_Tick(object sender, EventArgs e)
+        {
+            chart1.Series[0].Points.RemoveAt(0);
+
+
+        }
+
+        ///////////////Функции
+        private void scaleChart (Chart chart)   //автомасштабированиеи автоскалирование графика
+        {
+            var points = chart.Series[0].Points;
+            chart.ChartAreas[0].AxisY.Minimum = Math.Floor(points.Min(x => x.YValues[0]));      //минимальное значение Y. Округление в меньшую сторону
+            chart.ChartAreas[0].AxisY.Maximum = Math.Ceiling(points.Max(x => x.YValues[0]));    //макимальное значение Y. Округление в большую сторону
+            chart.ChartAreas[0].AxisX.ScaleView.Zoom(0, points.Count());                        //используется для автоскалированич
+        }
+
+        private void startCharts(Chart chart, Color color)  //стартование графика для онлайн отображения
+        {
+            //chart.ChartAreas[0].AxisX.ScaleView.Zoom(0, 200);
+            chart.ChartAreas[0].CursorX.IsUserEnabled = true;
+            chart.ChartAreas[0].CursorX.IsUserSelectionEnabled = true;
+            chart.ChartAreas[0].AxisX.ScaleView.Zoomable = true;
+            //chart.ChartAreas[0].AxisX.ScrollBar.IsPositionedInside = true;
+            chart.ChartAreas[0].AxisY.Interval = 1;
+            chart.ChartAreas[0].AxisX.Interval = 60;
+
+            chart.Series[0].Color = color;
+            chart.Series[0].BorderWidth = 1;
+        }
+
+
     }
 }

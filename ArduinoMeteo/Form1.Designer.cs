@@ -33,9 +33,18 @@
             System.Windows.Forms.DataVisualization.Charting.Legend legend1 = new System.Windows.Forms.DataVisualization.Charting.Legend();
             System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
             System.Windows.Forms.DataVisualization.Charting.Title title1 = new System.Windows.Forms.DataVisualization.Charting.Title();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea3 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend3 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series3 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Title title3 = new System.Windows.Forms.DataVisualization.Charting.Title();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea4 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend4 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series4 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Title title4 = new System.Windows.Forms.DataVisualization.Charting.Title();
             System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea2 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
             System.Windows.Forms.DataVisualization.Charting.Legend legend2 = new System.Windows.Forms.DataVisualization.Charting.Legend();
             System.Windows.Forms.DataVisualization.Charting.Series series2 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Title title2 = new System.Windows.Forms.DataVisualization.Charting.Title();
             this.serialPort1 = new System.IO.Ports.SerialPort(this.components);
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
             this.notifyIcon1 = new System.Windows.Forms.NotifyIcon(this.components);
@@ -54,14 +63,21 @@
             this.lblPort = new System.Windows.Forms.Label();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.chartCurrTemp = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.tabPage2 = new System.Windows.Forms.TabPage();
-            this.chart2 = new System.Windows.Forms.DataVisualization.Charting.Chart();
+            this.chart3 = new System.Windows.Forms.DataVisualization.Charting.Chart();
+            this.button2 = new System.Windows.Forms.Button();
+            this.button3 = new System.Windows.Forms.Button();
+            this.timer2 = new System.Windows.Forms.Timer(this.components);
+            this.chartCurrPressure = new System.Windows.Forms.DataVisualization.Charting.Chart();
             ((System.ComponentModel.ISupportInitialize)(this.chart1)).BeginInit();
             this.menuStrip1.SuspendLayout();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.chartCurrTemp)).BeginInit();
             this.tabPage2.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.chart2)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.chart3)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.chartCurrPressure)).BeginInit();
             this.SuspendLayout();
             // 
             // openFileDialog1
@@ -127,6 +143,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             chartArea1.Name = "ChartArea1";
             this.chart1.ChartAreas.Add(chartArea1);
+            legend1.Enabled = false;
             legend1.Name = "Legend1";
             this.chart1.Legends.Add(legend1);
             this.chart1.Location = new System.Drawing.Point(3, 3);
@@ -134,13 +151,13 @@
             series1.ChartArea = "ChartArea1";
             series1.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
             series1.Legend = "Legend1";
-            series1.Name = "Атмосферное давление";
+            series1.Name = "Температура";
             this.chart1.Series.Add(series1);
-            this.chart1.Size = new System.Drawing.Size(867, 370);
+            this.chart1.Size = new System.Drawing.Size(867, 168);
             this.chart1.TabIndex = 4;
             this.chart1.Text = "chart1";
             title1.Name = "Title1";
-            title1.Text = "График атомосферного давления и температуры";
+            title1.Text = "График температуры";
             this.chart1.Titles.Add(title1);
             // 
             // label3
@@ -193,6 +210,7 @@
             // 
             // lblPort
             // 
+            this.lblPort.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.lblPort.AutoSize = true;
             this.lblPort.Location = new System.Drawing.Point(817, 477);
             this.lblPort.Name = "lblPort";
@@ -201,6 +219,8 @@
             // 
             // tabControl1
             // 
+            this.tabControl1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.tabControl1.Controls.Add(this.tabPage1);
             this.tabControl1.Controls.Add(this.tabPage2);
             this.tabControl1.Location = new System.Drawing.Point(3, 75);
@@ -211,7 +231,8 @@
             // 
             // tabPage1
             // 
-            this.tabPage1.Controls.Add(this.chart2);
+            this.tabPage1.Controls.Add(this.chartCurrPressure);
+            this.tabPage1.Controls.Add(this.chartCurrTemp);
             this.tabPage1.Location = new System.Drawing.Point(4, 22);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
@@ -220,8 +241,31 @@
             this.tabPage1.Text = "Текущие параметры";
             this.tabPage1.UseVisualStyleBackColor = true;
             // 
+            // chartCurrTemp
+            // 
+            chartArea3.Name = "ChartArea1";
+            this.chartCurrTemp.ChartAreas.Add(chartArea3);
+            legend3.Enabled = false;
+            legend3.Name = "Legend1";
+            this.chartCurrTemp.Legends.Add(legend3);
+            this.chartCurrTemp.Location = new System.Drawing.Point(0, 0);
+            this.chartCurrTemp.Name = "chartCurrTemp";
+            series3.ChartArea = "ChartArea1";
+            series3.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
+            series3.Legend = "Legend1";
+            series3.Name = "Температура";
+            series3.YValuesPerPoint = 2;
+            this.chartCurrTemp.Series.Add(series3);
+            this.chartCurrTemp.Size = new System.Drawing.Size(873, 175);
+            this.chartCurrTemp.TabIndex = 0;
+            this.chartCurrTemp.Text = "chart2";
+            title3.Name = "Title1";
+            title3.Text = "Температруа в C";
+            this.chartCurrTemp.Titles.Add(title3);
+            // 
             // tabPage2
             // 
+            this.tabPage2.Controls.Add(this.chart3);
             this.tabPage2.Controls.Add(this.chart1);
             this.tabPage2.Location = new System.Drawing.Point(4, 22);
             this.tabPage2.Name = "tabPage2";
@@ -231,27 +275,82 @@
             this.tabPage2.Text = "Параметры за весь период";
             this.tabPage2.UseVisualStyleBackColor = true;
             // 
-            // chart2
+            // chart3
+            // 
+            this.chart3.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            chartArea4.Name = "ChartArea1";
+            this.chart3.ChartAreas.Add(chartArea4);
+            legend4.Enabled = false;
+            legend4.Name = "Legend1";
+            this.chart3.Legends.Add(legend4);
+            this.chart3.Location = new System.Drawing.Point(3, 177);
+            this.chart3.Name = "chart3";
+            series4.ChartArea = "ChartArea1";
+            series4.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
+            series4.Legend = "Legend1";
+            series4.Name = "Давление";
+            this.chart3.Series.Add(series4);
+            this.chart3.Size = new System.Drawing.Size(867, 193);
+            this.chart3.TabIndex = 5;
+            this.chart3.Text = "chart3";
+            title4.Name = "Title1";
+            title4.Text = "График атомосферного давления";
+            this.chart3.Titles.Add(title4);
+            // 
+            // button2
+            // 
+            this.button2.Location = new System.Drawing.Point(154, 48);
+            this.button2.Name = "button2";
+            this.button2.Size = new System.Drawing.Size(75, 23);
+            this.button2.TabIndex = 10;
+            this.button2.Text = "button2";
+            this.button2.UseVisualStyleBackColor = true;
+            this.button2.Click += new System.EventHandler(this.button2_Click);
+            // 
+            // button3
+            // 
+            this.button3.Location = new System.Drawing.Point(250, 48);
+            this.button3.Name = "button3";
+            this.button3.Size = new System.Drawing.Size(75, 23);
+            this.button3.TabIndex = 11;
+            this.button3.Text = "button3";
+            this.button3.UseVisualStyleBackColor = true;
+            this.button3.Click += new System.EventHandler(this.button3_Click);
+            // 
+            // timer2
+            // 
+            this.timer2.Tick += new System.EventHandler(this.timer2_Tick);
+            // 
+            // chartCurrPressure
             // 
             chartArea2.Name = "ChartArea1";
-            this.chart2.ChartAreas.Add(chartArea2);
+            this.chartCurrPressure.ChartAreas.Add(chartArea2);
+            legend2.Enabled = false;
             legend2.Name = "Legend1";
-            this.chart2.Legends.Add(legend2);
-            this.chart2.Location = new System.Drawing.Point(0, 0);
-            this.chart2.Name = "chart2";
+            this.chartCurrPressure.Legends.Add(legend2);
+            this.chartCurrPressure.Location = new System.Drawing.Point(0, 181);
+            this.chartCurrPressure.Name = "chartCurrPressure";
             series2.ChartArea = "ChartArea1";
+            series2.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
             series2.Legend = "Legend1";
             series2.Name = "Series1";
-            this.chart2.Series.Add(series2);
-            this.chart2.Size = new System.Drawing.Size(873, 373);
-            this.chart2.TabIndex = 0;
-            this.chart2.Text = "chart2";
+            this.chartCurrPressure.Series.Add(series2);
+            this.chartCurrPressure.Size = new System.Drawing.Size(873, 189);
+            this.chartCurrPressure.TabIndex = 1;
+            this.chartCurrPressure.Text = "chart4";
+            title2.Name = "Title1";
+            title2.Text = "Атмосферное давление в мм рт.ст";
+            this.chartCurrPressure.Titles.Add(title2);
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(884, 499);
+            this.Controls.Add(this.button3);
+            this.Controls.Add(this.button2);
             this.Controls.Add(this.tabControl1);
             this.Controls.Add(this.lblPort);
             this.Controls.Add(this.label4);
@@ -270,8 +369,10 @@
             this.menuStrip1.PerformLayout();
             this.tabControl1.ResumeLayout(false);
             this.tabPage1.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.chartCurrTemp)).EndInit();
             this.tabPage2.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.chart2)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.chart3)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.chartCurrPressure)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -297,8 +398,13 @@
         private System.Windows.Forms.Label lblPort;
         private System.Windows.Forms.TabControl tabControl1;
         private System.Windows.Forms.TabPage tabPage1;
-        private System.Windows.Forms.DataVisualization.Charting.Chart chart2;
+        private System.Windows.Forms.DataVisualization.Charting.Chart chartCurrTemp;
         private System.Windows.Forms.TabPage tabPage2;
+        private System.Windows.Forms.Button button2;
+        private System.Windows.Forms.DataVisualization.Charting.Chart chart3;
+        private System.Windows.Forms.Button button3;
+        private System.Windows.Forms.Timer timer2;
+        private System.Windows.Forms.DataVisualization.Charting.Chart chartCurrPressure;
     }
 }
 
