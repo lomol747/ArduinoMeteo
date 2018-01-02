@@ -11,7 +11,7 @@ using System.Windows.Forms;
 using System.IO.Ports;
 using System.IO;
 using System.Windows.Forms.DataVisualization.Charting;
-
+using System.Threading;
 
 namespace ArduinoMeteo
 {
@@ -37,17 +37,22 @@ namespace ArduinoMeteo
             initSerialPort();           //функция инициализации порта
             timer1.Start();             //старт таймера для пинга
 
-
-            startCharts(chartCurrTemp, Color.Red);
+            
+            startCharts(chartCurrTemp, Color.Red);      //вывод графиков онлайн
             startCharts(chartCurrPressure, Color.Blue);
-            //startChart();
+
+            cmbPeriod.SelectedIndex = cmbPeriod.Items.IndexOf("За сутки");  //период, значение по умолчанию
+            startChart(chart1, settings.dbTemp());      //вывод графиков из БД
+            startChart(chart3, settings.dbPressure());
+
+            
+
 
         }
 
         private void initSerialPort ()
         {
             lblPort.Text = settings.getPortName();    //выводим текущий ком порт
-
             //
             try
             {
@@ -82,12 +87,9 @@ namespace ArduinoMeteo
         //поток ком порта
         private void SerialPort1_DataReceived(object sender, SerialDataReceivedEventArgs e) //для давления
         {
-
             try
             {
                 string pressure = serialPort1.ReadLine();   //получаем строку. Должна быть влажность
-                
-
                 this.BeginInvoke(new LineReceivedEvent(LineReceived), pressure);    //выполнение делегата
 
                 label3.ForeColor = Color.Red;   //пинг
@@ -206,62 +208,70 @@ namespace ArduinoMeteo
 
         
 
-        private void startChart ()  //графики на второй вкладке
+        private void startChart (Chart chart, string filePath)  //графики на второй вкладке
         {
-            
+            DateTime dateFrom = DateTime.MinValue;  //дата С
+            DateTime dateTo = DateTime.Now;         //дата ПО
+            DateTime dateLoop;                      //дата для цикла
+
+            switch (cmbPeriod.SelectedItem.ToString())
+            {
+                case "За сутки":
+                    dateFrom = DateTime.Now.AddDays(-1);
+                    break;
+                case "За неделю":
+                    dateFrom = DateTime.Now.AddDays(-7);
+                    break;
+                case "За месяц":
+                    dateFrom = DateTime.Now.AddDays(-31);
+                    break;
+                case "За пол года":
+                    dateFrom = DateTime.Now.AddDays(-183);
+                    break;
+                case "За год":
+                    dateFrom = DateTime.Now.AddDays(-366);
+                    break;
+            }
+
+
             //chart1.ChartAreas[0].AxisX.ScaleView.Zoom(0, 200);
-            chart1.ChartAreas[0].CursorX.IsUserEnabled = true;
-            chart1.ChartAreas[0].CursorX.IsUserSelectionEnabled = true;
-            chart1.ChartAreas[0].AxisX.ScaleView.Zoomable = true;
-            chart1.ChartAreas[0].AxisX.ScrollBar.IsPositionedInside = true;
-            chart1.ChartAreas[0].AxisY.Interval = 1;
+            chart.ChartAreas[0].CursorX.IsUserEnabled = true;
+            chart.ChartAreas[0].CursorX.IsUserSelectionEnabled = true;
+            chart.ChartAreas[0].AxisX.ScaleView.Zoomable = true;
+            chart.ChartAreas[0].AxisX.ScrollBar.IsPositionedInside = true;
+            //chart1.ChartAreas[0].AxisY.Interval = 2;
+            //chart.Series[0].Color = Color.Red;
+            chart.Series[0].BorderWidth = 1;
 
-            StreamReader streamReader = new StreamReader(settings.dbTemp());
-            //chart1.Series[0].Points.Clear();
+            chart.Series[0].Points.Clear();
 
+            
+            StreamReader streamReader = new StreamReader(filePath);
             while (!streamReader.EndOfStream)
             {
                 string Y = streamReader.ReadLine();
                 string X = streamReader.ReadLine();
 
-                chart1.Series[0].Color = Color.Red;
-                chart1.Series[0].BorderWidth = 1;
-                chart1.Series[0].Points.AddXY(X, Y);
+                //date = X.Remove(10);
+                dateLoop = DateTime.Parse(X);
+
+
+                if (dateLoop >= dateFrom && dateLoop <= dateTo)
+                { 
+
+                chart.Series[0].Points.AddXY(X, Y);
+                }
             }
             streamReader.Close();
 
+            //scaleChart(chart);
 
+            //костыль для отображения колиества точек
+            if (chart.Equals(chart1))
+                countPointTemp.Text = "Количество точек: " + chart.Series[0].Points.Count();
+            else if (chart.Equals(chart3))
+                countPointPressure.Text = "Количество точек: " + chart.Series[0].Points.Count();
 
-
-            //chart3.ChartAreas[0].AxisX.ScaleView.Zoom(0, 200);
-            chart3.ChartAreas[0].CursorX.IsUserEnabled = true;
-            chart3.ChartAreas[0].CursorX.IsUserSelectionEnabled = true;
-            chart3.ChartAreas[0].AxisX.ScaleView.Zoomable = true;
-            chart3.ChartAreas[0].AxisX.ScrollBar.IsPositionedInside = true;
-            //chart3.ChartAreas[0].AxisY.Interval = 0.5;
-
-            streamReader = new StreamReader(settings.dbPressure());
-            //chart3.Series[0].Points.Clear();
-
-            while (!streamReader.EndOfStream)
-            {
-                string Y = streamReader.ReadLine();
-                string X = streamReader.ReadLine();
-
-                chart3.Series[0].Color = Color.Blue;
-                chart3.Series[0].BorderWidth = 1;
-                chart3.Series[0].Points.AddXY(X, Y);
-            }
-            streamReader.Close();
-
-            //var points = chart1.Series[0].Points;
-            //chart1.ChartAreas[0].AxisY.Minimum = Math.Floor(points.Min(x => x.YValues[0]));      //минимальное значение Y. Округление в меньшую сторону
-            //chart1.ChartAreas[0].AxisY.Maximum = Math.Ceiling(points.Max(x => x.YValues[0]));    //макимальное значение Y. Округление в большую сторону
-            //chart1.ChartAreas[0].AxisX.ScaleView.Zoom(0, points.Count());
-
-            //chart1.chang
-            scaleChart(chart1);
-            scaleChart(chart3);
             fChart = true;
 
         }
@@ -273,6 +283,13 @@ namespace ArduinoMeteo
             {
                 //label3.Text = s.ToString();
                 s++;
+                //if (fChart)
+                //{
+                //    scaleChart(chart1);
+                //    scaleChart(chart3);
+
+                //    fChart = false;
+                //}
             }
             else
             {
@@ -285,16 +302,16 @@ namespace ArduinoMeteo
             if (chart1.Visible)
                 button3.Text = "Отображается";
 
-            //if (fChart)
-            //{
-            //    scaleChart(chart1);
-            //    scaleChart(chart3);
-            //    fChart = false;
-            //}
+            if (fChart)
+            {
+                scaleChart(chart1);
+                scaleChart(chart3);
+                fChart = false;
+            }
 
         }
 
-
+        
 
         /// /////////////////////////////////////////////////////////////Меню
         /// //////////Кнопка настроек
@@ -319,7 +336,10 @@ namespace ArduinoMeteo
 
         private void button2_Click(object sender, EventArgs e)
         {
-            startChart();
+            //startChart();
+
+            scaleChart(chart1);
+            scaleChart(chart3);
         }
 
         private void button3_Click(object sender, EventArgs e)  ///тестовая кнопка
@@ -330,7 +350,8 @@ namespace ArduinoMeteo
             //chartRefresh cartRefresh = new chartRefresh(startChart);
             //cartRefresh();
             //chart1.BeginInvoke(new chartRefresh(startChart));
-            chart1.Invoke(new Action(() => { startChart(); }));
+            //chart1.Invoke(new Action(() => { startChart(); }));
+            scaleChart(chart1);
         }
 
         //Таймер 2
@@ -345,12 +366,15 @@ namespace ArduinoMeteo
         private void scaleChart (Chart chart)   //автомасштабированиеи автоскалирование графика
         {
             var points = chart.Series[0].Points;
-            chart.ChartAreas[0].AxisY.Minimum = Math.Floor(points.Min(x => x.YValues[0]));      //минимальное значение Y. Округление в меньшую сторону
-            chart.ChartAreas[0].AxisY.Maximum = Math.Ceiling(points.Max(x => x.YValues[0]));    //макимальное значение Y. Округление в большую сторону
-            chart.ChartAreas[0].AxisX.ScaleView.Zoom(0, points.Count());                        //используется для автоскалированич
+            if (points.Count() > 0)                 //проверка на наличие точек. Если их нет, то возникает ошибка. Не ПРОТЕСТИРОВАНО
+            {
+                chart.ChartAreas[0].AxisY.Minimum = Math.Floor(points.Min(x => x.YValues[0]));      //минимальное значение Y. Округление в меньшую сторону
+                chart.ChartAreas[0].AxisY.Maximum = Math.Ceiling(points.Max(x => x.YValues[0]));    //макимальное значение Y. Округление в большую сторону
+                chart.ChartAreas[0].AxisX.ScaleView.Zoom(0, points.Count());                        //используется для автоскалированич
+            }
         }
 
-        private void startCharts(Chart chart, Color color)  //стартование графика для онлайн отображения
+        private void startCharts(Chart chart, Color color)  //стартование графика для ОНЛАЙН отображения
         {
             //chart.ChartAreas[0].AxisX.ScaleView.Zoom(0, 200);
             chart.ChartAreas[0].CursorX.IsUserEnabled = true;
@@ -362,6 +386,15 @@ namespace ArduinoMeteo
 
             chart.Series[0].Color = color;
             chart.Series[0].BorderWidth = 1;
+        }
+
+        private void cmbPeriod_SelectionChangeCommitted(object sender, EventArgs e) //выбор периода
+        {
+            //chart1.Series[0].Points.Clear();
+            //chart3.Series[0].Points.Clear();
+
+            startChart(chart1, settings.dbTemp());
+            startChart(chart3, settings.dbPressure());
         }
 
 
