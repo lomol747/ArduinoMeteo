@@ -245,7 +245,6 @@ namespace ArduinoMeteo
 
             chart.Series[0].Points.Clear();
 
-            
             StreamReader streamReader = new StreamReader(filePath);
             while (!streamReader.EndOfStream)
             {
@@ -273,7 +272,6 @@ namespace ArduinoMeteo
                 countPointPressure.Text = "Количество точек: " + chart.Series[0].Points.Count();
 
             fChart = true;
-
         }
 
         //************************ПИНГ - ТАЙМЕР
@@ -311,8 +309,6 @@ namespace ArduinoMeteo
 
         }
 
-        
-
         /// /////////////////////////////////////////////////////////////Меню
         /// //////////Кнопка настроек
         private void settingToolStripMenuItem_Click(object sender, EventArgs e) //кнопка 
@@ -331,7 +327,6 @@ namespace ArduinoMeteo
                 System.Threading.Thread.Sleep(1650);        // упрощённая задержка по сравнению с верхними строками
                 serialPort1.Write(settings.getTimeUpdate());    //сама передач в порт
             }
-
         }
 
         private void button2_Click(object sender, EventArgs e)
