@@ -25,8 +25,6 @@ namespace ArduinoMeteo
         //********************************
         private bool fChart = false;
 
-
-
         public Form1()
         {
             InitializeComponent();
@@ -44,9 +42,6 @@ namespace ArduinoMeteo
             startChart(chart1, settings.dbTemp());      //вывод графиков из БД
             startChart(chart3, settings.dbPressure());
 
-            
-
-
         }
 
         private void initSerialPort ()
@@ -61,7 +56,6 @@ namespace ArduinoMeteo
                     serialPort1.DiscardOutBuffer(); //их наличие под вопросом
 
                     serialPort1.Close();
-                    
                 }
 
                 serialPort1.PortName = settings.getPortName();  //имя порта
@@ -77,7 +71,6 @@ namespace ArduinoMeteo
             catch
             {
                 lblPort.ForeColor = Color.Red;      //текущий копм порт внизу окна
-                
                 MessageBox.Show("Отсутствует подключение к устройству", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);  //исключение для ошибки
             }
         }
@@ -94,8 +87,6 @@ namespace ArduinoMeteo
                 label3.ForeColor = Color.Red;   //пинг
                 label3.BackColor = Color.Red;
                 fPing = true;                   //флаг для таймера
-            
-
             }
             catch   //КОСТЫЛЬ!!! Будет выпадать ошибка, не выяснено почему, скорее всего что-то со строками и буфером. Не критично, код дальше продолжает выполняться
             {
@@ -130,7 +121,6 @@ namespace ArduinoMeteo
             textBox1.Text = pressure;                       //отображение значения
             string path = settings.dbPressure();            //Наименование файла с логами
             string date = DateTime.Now.ToString();          //получаем текущую дату
-
 
             //chartCurrPressure.ChartAreas[0].AxisX.ScaleView.Zoom(0, countTemp);
             chartCurrPressure.Series[0].Points.AddXY(date, pressure);
@@ -168,8 +158,6 @@ namespace ArduinoMeteo
             }
             
         }
-
-
 
 
         private void textBox1_TextChanged(object sender, EventArgs e)
