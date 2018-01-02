@@ -383,7 +383,5 @@ namespace ArduinoMeteo
             startChart(chart1, settings.dbTemp());
             startChart(chart3, settings.dbPressure());
         }
-
-
     }
 }
