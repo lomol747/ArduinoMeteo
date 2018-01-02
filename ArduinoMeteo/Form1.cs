@@ -17,7 +17,6 @@ namespace ArduinoMeteo
 {
     public partial class Form1 : Form
     {
-
         Settings settings;  //настройки
 
         //Для таймер-пинга
